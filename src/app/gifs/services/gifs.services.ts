@@ -1,11 +1,20 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Gif, SearchResponse } from '../interfaces/gifs.interfaces';
 
 @Injectable({providedIn: 'root'})
 export class GifService {
 
-  private _tagsHistory: string[] = [];
+  public gifList: Gif[] = [];
 
-  constructor() { }
+  private _tagsHistory: string[] = [];
+  private apiKey:       string = 'SXhz2trdEkWfPEZ0CRlMGvz6Pc7SNYSj';
+  private serviceUrl:   string = 'https://api.giphy.com/v1/gifs';
+
+  constructor( private http: HttpClient) {
+    this.loadLocalStorage();
+    console.log('Gifs services ready');
+  }
 
   get tagsHistory() {
     return [...this._tagsHistory];
@@ -24,13 +33,37 @@ export class GifService {
     //Esta linea me permite insertar el tag al principio
     this._tagsHistory.unshift( tag );
     this._tagsHistory = this._tagsHistory.splice(0,10);
+    this.saveLocalStorage();
 
   }
 
-  searchTag( tag: string): void {
+  private saveLocalStorage(): void {
+    localStorage.setItem('history', JSON.stringify(this._tagsHistory))
+  }
+
+  private loadLocalStorage(): void
+  {
+    if ( !localStorage.getItem('history')) return;
+    this._tagsHistory = JSON.parse(localStorage.getItem('history')!);
+
+    if ( this._tagsHistory.length === 0 ) return;
+    this.searchTag(this._tagsHistory[0])
+  }
+
+  searchTag( tag: string):void {
     //Esta funcion permite agregar el tag que recibio la funcion al final del arreglo privado _tagsHistory]
     if (tag.length === 0 ) return;
     this.organizeHistory(tag);
+
+    const params = new HttpParams()
+      .set('api_key', this.apiKey)
+      .set('limit', 10)
+      .set('q', tag )
+
+    this.http.get<SearchResponse>(`${ this.serviceUrl}/search`, { params })
+      .subscribe( resp => {
+        this.gifList = resp.data;
+      });
 
   }
 

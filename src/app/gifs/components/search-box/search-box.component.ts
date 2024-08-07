@@ -13,7 +13,7 @@ import { GifService } from '../../services/gifs.services';
   `
 })
 
-export class SearchBoxCompoenent {
+export class SearchBoxComponent {
   // Sirve para obtener la referencia local del txtTagInput utilizdo como identificador en la plantilla de arriba para la entrada en el input
   @ViewChild('txtTagInput')
     public tagInput!: ElementRef<HTMLInputElement>;

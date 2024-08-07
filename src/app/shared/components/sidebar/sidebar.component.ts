@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { GifService } from '../../../gifs/services/gifs.services';
 
 @Component({
@@ -12,8 +12,12 @@ export class SidebarComponent {
   //HTML Tenga una propiedad publica
   constructor(private gifService: GifService) {}
 
-  get tags() {
+  get tags(): string[] {
     return this.gifService.tagsHistory;
+  }
+
+  searchBoxComponent( tag: string): void {
+    return this.gifService.searchTag(tag);
   }
 
 }
